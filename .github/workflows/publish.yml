@@ -1,0 +1,37 @@
+# Publishes to Hex. Runs in THIS public repo so the Hex API key never lives in
+# the private monorepo, and so the published package points at a source tree
+# anyone can read. Overwritten on each sync.
+#
+# Triggered by a version tag (`vX.Y.Z`) pushed to this repo, or manually.
+#
+# One-time setup: create a Hex publishing key (`mix hex.user key generate
+# --permission api:write`) and store it as the repo secret HEX_API_KEY.
+name: Publish to Hex
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18"
+          otp-version: "27"
+      - name: Verify before publishing
+        run: mix test
+      # ex_doc is a dev-only dependency; `mix hex.publish` needs it to build the
+      # docs it uploads alongside the package.
+      - name: Fetch doc tooling
+        run: mix deps.get
+      - name: Publish
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
