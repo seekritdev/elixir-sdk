@@ -48,6 +48,8 @@ defmodule Seekrit.MixProject do
       links: %{
         "Website" => "https://seekrit.dev",
         "Documentation" => "https://seekrit.dev/docs/guides/sdks",
+        "AI agents" => "https://seekrit.dev/docs/guides/ai-agents",
+        "Security model" => "https://seekrit.dev/docs/concepts/security",
         "GitHub" => @source_url
       }
     ]
