@@ -9,7 +9,7 @@ defmodule Seekrit.Crypto do
 
   Blob formats (all segments base64url, no padding):
 
-      token       skt_<id>_<pkcs8 private key>
+      token       skt_<id>_v2.<auth secret>.<pkcs8 private key>
       wrapped DEK wd1.<ephemeral pub (raw SEC1)>.<hkdf salt>.<iv>.<ciphertext||tag>
       secret      sc1.<iv>.<ciphertext||tag>
 
@@ -25,7 +25,21 @@ defmodule Seekrit.Crypto do
   @tag_bytes 16
 
   # Only the first two underscores are separators; the key segment may contain "_".
-  @token_re ~r/\A(skt_[0-9A-Za-z]+)_([A-Za-z0-9_-]+)\z/
+  @auth_re ~r/\A(skt_[0-9A-Za-z]+_v2\.[A-Za-z0-9_-]{43})(?:\.[A-Za-z0-9_-]+)?\z/
+  @token_re ~r/\A(skt_[0-9A-Za-z]+)_(?:v2\.[A-Za-z0-9_-]{43}\.)?([A-Za-z0-9_-]+)\z/
+
+  @doc "Extract the v2 wire credential without exposing the private key."
+  def service_token_auth(token) do
+    case Regex.run(@auth_re, token) do
+      [_, auth] ->
+        {:ok, auth}
+
+      _ ->
+        crypto_error(
+          "a v2 service token is required for API access; replace legacy tokens in the dashboard"
+        )
+    end
+  end
 
   defmodule TokenKey do
     @moduledoc """

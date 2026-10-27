@@ -66,7 +66,8 @@ defmodule Seekrit.ClientTest do
 
     assert_received {:request, request}
     assert request =~ "GET /v1/resolve HTTP/1.1"
-    assert request =~ "authorization: Bearer #{@vectors["token"]}"
+    assert request =~ "authorization: Bearer #{@vectors["authToken"]}"
+    refute request =~ List.last(String.split(@vectors["token"], "."))
     assert request =~ "accept: application/json"
   end
 
@@ -84,6 +85,14 @@ defmodule Seekrit.ClientTest do
     assert {:ok, _} = Client.resolve(client!(api_url: context.api_url <> "///"))
     assert_received {:request, request}
     assert request =~ "GET /v1/resolve HTTP/1.1"
+  end
+
+  test "auth credentials cannot decrypt and legacy bundles are offline only" do
+    assert {:error, _} = Seekrit.Crypto.parse_token_key(@vectors["authToken"])
+    key = @vectors["token"] |> String.split(".") |> List.last()
+    legacy = @vectors["tokenId"] <> "_" <> key
+    assert {:ok, _} = Seekrit.Crypto.parse_token_key(legacy)
+    assert {:error, _} = Client.new(token: legacy)
   end
 
   test "a non-2xx surfaces the API's status and error code", context do

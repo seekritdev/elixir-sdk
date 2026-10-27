@@ -84,10 +84,11 @@ defmodule Seekrit.Client do
     if is_nil(token) or token == "" do
       {:error, %Error{message: "no service token: pass :token or set SEEKRIT_TOKEN"}}
     else
-      with {:ok, key} <- Crypto.parse_token_key(token) do
+      with {:ok, key} <- Crypto.parse_token_key(token),
+           {:ok, auth} <- Crypto.service_token_auth(token) do
         {:ok,
          %__MODULE__{
-           token: token,
+           token: auth,
            key: key,
            api_url: api_url(opts),
            overrides: normalize_overrides(Keyword.get(opts, :with, %{})),
