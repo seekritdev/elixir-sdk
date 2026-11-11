@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/mileszim/seekrit/compare/sdk-elixir-v0.3.0...sdk-elixir-v0.4.0) (2026-11-11)
+
+
+### Features
+
+* **site:** one category sentence across site, llms.txt and package descriptions ([#580](https://github.com/mileszim/seekrit/issues/580)) ([7a3eb05](https://github.com/mileszim/seekrit/commit/7a3eb055806625b225f3f86491b54969a8c9fdda))
+
 ## [0.3.0](https://github.com/mileszim/seekrit/compare/sdk-elixir-v0.2.0...sdk-elixir-v0.3.0) (2026-10-27)
 
 
